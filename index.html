@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'none'" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="A glassmorphism weather forecast app with current conditions, an hourly strip and a 5-day outlook." />
+  <title>Weather Forecast · Auspify Task 3</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="theme-clear-day">
+  <div class="sky" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+    <div class="precip">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">⛅</span>
+      <h1 class="brand-name">Weather Forecast</h1>
+    </div>
+    <div class="unit-toggle" role="group" aria-label="Temperature unit">
+      <button type="button" id="unit-metric" class="unit-btn is-active" aria-pressed="true">°C</button>
+      <button type="button" id="unit-imperial" class="unit-btn" aria-pressed="false">°F</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="search-panel" aria-label="Search for a city">
+      <form id="search-form" class="search-form" novalidate autocomplete="off">
+        <div class="search-field">
+          <label class="sr-only" for="city-input">City name</label>
+          <input
+            id="city-input"
+            class="search-input"
+            type="text"
+            name="city"
+            placeholder="Search a city, e.g. Lahore"
+            maxlength="60"
+            autocomplete="off"
+            spellcheck="false"
+            role="combobox"
+            aria-expanded="false"
+            aria-autocomplete="list"
+            aria-controls="suggestions"
+          />
+          <button type="submit" id="search-btn" class="btn btn-primary">Search</button>
+          <ul id="suggestions" class="suggestions" role="listbox" aria-label="City suggestions" hidden></ul>
+        </div>
+      </form>
+      <div class="search-actions">
+        <button type="button" id="locate-btn" class="btn btn-ghost">
+          <span aria-hidden="true">📍</span>
+          <span>Use my location</span>
+        </button>
+      </div>
+    </section>
+
+    <div id="alert-box" class="alert" role="status" aria-live="polite" hidden>
+      <span class="alert-icon" aria-hidden="true">⚠️</span>
+      <p class="alert-text" id="alert-text"></p>
+      <button type="button" id="alert-close" class="alert-close" aria-label="Dismiss message">✕</button>
+    </div>
+
+    <p id="status" class="sr-only" role="status" aria-live="polite"></p>
+
+    <section id="recent-section" class="recent" aria-label="Recent searches" hidden>
+      <div class="recent-head">
+        <h2 class="section-title">Recent searches</h2>
+        <button type="button" id="clear-recent" class="btn btn-small">Clear</button>
+      </div>
+      <div class="recent-chips" id="recent-chips"></div>
+    </section>
+
+    <section id="welcome" class="welcome">
+      <p class="welcome-emoji" aria-hidden="true">🌤️</p>
+      <h2 class="welcome-title">Check the sky anywhere</h2>
+      <p class="welcome-text">
+        Search for a city or share your location to see current conditions, the next 24 hours and a five day outlook.
+      </p>
+    </section>
+
+    <section id="current-panel" class="panel" aria-label="Current weather" aria-busy="false" hidden>
+      <div id="current-skeleton" class="skeleton-block" hidden>
+        <div class="skeleton-card card">
+          <span class="skeleton sk-line sk-w-40"></span>
+          <span class="skeleton sk-line sk-w-60"></span>
+          <span class="skeleton sk-line sk-w-30"></span>
+          <span class="skeleton sk-hero"></span>
+          <span class="skeleton sk-line sk-w-45"></span>
+        </div>
+      </div>
+      <article id="current-card" class="current-card card" hidden>
+        <div class="current-head">
+          <div class="current-place">
+            <h2 class="place-name" id="place-name"></h2>
+            <p class="place-meta" id="place-meta"></p>
+          </div>
+          <div class="hero">
+            <span class="hero-icon" id="hero-icon" role="img" aria-label="Weather icon"></span>
+            <p class="hero-temp">
+              <span class="hero-value" id="hero-value"></span>
+              <span class="hero-unit" id="hero-unit"></span>
+            </p>
+          </div>
+        </div>
+        <p class="condition" id="current-condition"></p>
+        <dl class="current-stats">
+          <div class="stat">
+            <dt>Feels like</dt>
+            <dd id="stat-feels"></dd>
+          </div>
+          <div class="stat">
+            <dt>Lowest</dt>
+            <dd id="stat-min"></dd>
+          </div>
+          <div class="stat">
+            <dt>Highest</dt>
+            <dd id="stat-max"></dd>
+          </div>
+        </dl>
+      </article>
+    </section>
+
+    <section id="details-section" class="panel" aria-label="Weather details" aria-busy="false" hidden>
+      <h2 class="section-title">Weather details</h2>
+      <div class="detail-grid" id="detail-grid"></div>
+    </section>
+
+    <section id="hourly-section" class="panel" aria-label="Hourly forecast" aria-busy="false" hidden>
+      <h2 class="section-title">Next 24 hours</h2>
+      <div class="hourly-strip" id="hourly-strip"></div>
+    </section>
+
+    <section id="daily-section" class="panel" aria-label="Five day forecast" aria-busy="false" hidden>
+      <h2 class="section-title">5-day forecast</h2>
+      <div class="daily-grid" id="daily-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="credit">Built by Muhammad Taha | Auspify Technologies Internship</p>
+    <p class="credit">
+      <a class="credit-link" href="https://openweathermap.org/" target="_blank" rel="noopener noreferrer">
+        Weather data by OpenWeatherMap
+      </a>
+    </p>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

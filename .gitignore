@@ -1,0 +1,12 @@
+# Private environment file holding the OpenWeatherMap key
+.env
+.env.local
+
+# Vercel project settings created by the CLI
+.vercel
+
+# Packages used only by local tooling
+node_modules
+
+# macOS folder metadata
+.DS_Store
